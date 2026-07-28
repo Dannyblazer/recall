@@ -9,9 +9,9 @@ before:
 builds:
   - id: recall
     binary: recall
-    main: .
+    main: ./cmd/recall   # update if your main package lives elsewhere, e.g. ./cmd/recall
     env:
-      - CGO_ENABLED=0
+      - CGO_ENABLED=0   # modernc.org/sqlite is pure Go — no CGO needed
     goos:
       - linux
       - darwin
@@ -35,7 +35,6 @@ archives:
 checksum:
   name_template: "checksums.txt"
 
-# --- .deb / apt packaging ---
 nfpms:
   - id: recall-deb
     package_name: recall
@@ -43,10 +42,10 @@ nfpms:
       {{ .ConventionalFileName }}
     vendor: Daniel Nnaji
     homepage: https://github.com/Dannyblazer/recall
-    maintainer: Daniel Nnaji nnajidanny004@gmail.com
+    maintainer: Daniel Nnaji nnajidanny004#gmail.com
     description: >-
-      A lite, zero-dependency Go tool that searches and archives
-      shell history beyond bash's default limits.
+      A persistent, searchable shell command history tool for Bash, Zsh,
+      and Fish — backed by SQLite with optional cloud sync/backup.
     license: MIT
     formats:
       - deb
@@ -55,20 +54,15 @@ nfpms:
       - src: ./README.md
         dst: /usr/share/doc/recall/README.md
 
-# --- Signing the .deb / repo metadata ---
-# goreleaser can sign checksums directly with your GPG key.
-# The private key is passed via the GPG_FINGERPRINT / GORELEASER
-# environment during CI — never commit it.
-# Uncomment once you've generated a key (see walkthrough step 3):
-# signs:
-#   - cmd: gpg
-#     signature: "${artifact}.sig"
-#     args:
-#       - "--output"
-#       - "${signature}"
-#       - "--detach-sign"
-#       - "${artifact}"
-#     artifacts: checksum
+signs:
+  - cmd: gpg
+    signature: "${artifact}.sig"
+    args:
+      - "--output"
+      - "${signature}"
+      - "--detach-sign"
+      - "${artifact}"
+    artifacts: checksum
 
 release:
   github:
