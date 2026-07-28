@@ -53,6 +53,12 @@ nfpms:
     contents:
       - src: ./README.md
         dst: /usr/share/doc/recall/README.md
+      - src: ./hooks/recall.bash
+        dst: /usr/share/recall/hooks/recall.bash
+      - src: ./hooks/recall.zsh
+        dst: /usr/share/recall/hooks/recall.zsh
+      - src: ./hooks/recall.fish
+        dst: /usr/share/recall/hooks/recall.fish
 
 signs:
   - cmd: gpg
