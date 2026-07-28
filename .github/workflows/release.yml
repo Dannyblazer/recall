@@ -46,5 +46,5 @@ jobs:
         run: |
           pip install --user cloudsmith-cli
           for deb in dist/*.deb; do
-            ~/.local/bin/cloudsmith push deb debian-o02u/recall/any-distro/any-version "$deb"
+            ~/.local/bin/cloudsmith push deb debian-o02u/recall/any-distro/any-version "$deb" -k "$CLOUDSMITH_API_KEY"
           done
