@@ -1,0 +1,84 @@
+version: 2
+
+project_name: recall
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: recall
+    binary: recall
+    main: .
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}}
+
+archives:
+  - id: recall-archive
+    format: tar.gz
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- .Os }}_
+      {{- .Arch }}
+    files:
+      - LICENSE*
+      - README*
+
+checksum:
+  name_template: "checksums.txt"
+
+# --- .deb / apt packaging ---
+nfpms:
+  - id: recall-deb
+    package_name: recall
+    file_name_template: >-
+      {{ .ConventionalFileName }}
+    vendor: Daniel Nnaji
+    homepage: https://github.com/Dannyblazer/recall
+    maintainer: Daniel Nnaji nnajidanny004@gmail.com
+    description: >-
+      A lite, zero-dependency Go tool that searches and archives
+      shell history beyond bash's default limits.
+    license: MIT
+    formats:
+      - deb
+    bindir: /usr/bin
+    contents:
+      - src: ./README.md
+        dst: /usr/share/doc/recall/README.md
+
+# --- Signing the .deb / repo metadata ---
+# goreleaser can sign checksums directly with your GPG key.
+# The private key is passed via the GPG_FINGERPRINT / GORELEASER
+# environment during CI — never commit it.
+# Uncomment once you've generated a key (see walkthrough step 3):
+# signs:
+#   - cmd: gpg
+#     signature: "${artifact}.sig"
+#     args:
+#       - "--output"
+#       - "${signature}"
+#       - "--detach-sign"
+#       - "${artifact}"
+#     artifacts: checksum
+
+release:
+  github:
+    owner: Dannyblazer
+    name: recall
+  draft: false
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
