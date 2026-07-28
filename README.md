@@ -1,6 +1,17 @@
 # recall — persistent, searchable shell history
 
-## Build
+## Install
+
+### Debian / Ubuntu (apt)
+
+```bash
+curl -1sLf 'https://dl.cloudsmith.io/public/debian-o02u/recall/setup.deb.sh' | sudo -E bash
+sudo apt-get install recall
+```
+
+This adds the signed `recall` apt repository and installs the latest release. Packages are built, signed, and published automatically via CI on every tagged release.
+
+### Build from source
 
 ```
 go mod tidy   # fetches modernc.org/sqlite (pure Go, no cgo needed)
