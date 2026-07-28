@@ -38,6 +38,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GPG_FINGERPRINT: ${{ env.GPG_FINGERPRINT }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
       - name: Publish .deb packages to Cloudsmith
         env:
@@ -45,5 +46,5 @@ jobs:
         run: |
           pip install --user cloudsmith-cli
           for deb in dist/*.deb; do
-            ~/.local/bin/cloudsmith push deb debian-o02u/recall/any-distro/any-version "$deb"
+            ~/.local/bin/cloudsmith push deb debian-o02u/recall/any-distro/any-version "$deb" -k "$CLOUDSMITH_API_KEY"
           done
