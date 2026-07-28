@@ -42,7 +42,7 @@ nfpms:
       {{ .ConventionalFileName }}
     vendor: Daniel Nnaji
     homepage: https://github.com/Dannyblazer/recall
-    maintainer: Daniel Nnaji nnajidanny004#gmail.com
+    maintainer: Daniel Nnaji nnajidanny004@gmail.com
     description: >-
       A persistent, searchable shell command history tool for Bash, Zsh,
       and Fish — backed by SQLite with optional cloud sync/backup.
@@ -58,6 +58,9 @@ signs:
   - cmd: gpg
     signature: "${artifact}.sig"
     args:
+      - "--batch"
+      - "--pinentry-mode"
+      - "loopback"
       - "--output"
       - "${signature}"
       - "--detach-sign"
