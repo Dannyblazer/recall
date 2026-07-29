@@ -19,7 +19,7 @@ const hooksDir = "/usr/share/recall/hooks"
 // hookMarker is written into each hook script so appendShellHook can detect
 // whether it's already been added, instead of appending duplicates on every
 // `recall init` run.
-const hookMarker = "recall shell hook"
+const hookMarker = "recall shell integration"
 
 const (
 	bashShell shellType = "bash"
