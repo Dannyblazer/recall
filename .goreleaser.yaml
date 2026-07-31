@@ -9,7 +9,7 @@ before:
 builds:
   - id: recall
     binary: recall
-    main: ./cmd/recall   # update if your main package lives elsewhere, e.g. ./cmd/recall
+    main: ./cmd/recall
     env:
       - CGO_ENABLED=0   # modernc.org/sqlite is pure Go — no CGO needed
     goos:
@@ -53,12 +53,6 @@ nfpms:
     contents:
       - src: ./README.md
         dst: /usr/share/doc/recall/README.md
-      - src: ./hooks/recall.bash
-        dst: /usr/share/recall/hooks/recall.bash
-      - src: ./hooks/recall.zsh
-        dst: /usr/share/recall/hooks/recall.zsh
-      - src: ./hooks/recall.fish
-        dst: /usr/share/recall/hooks/recall.fish
 
 signs:
   - cmd: gpg

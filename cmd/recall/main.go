@@ -1,8 +1,8 @@
 package main
 
 import (
+	"embed"
 	"fmt"
-	"io"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -13,13 +13,16 @@ import (
 
 type shellType string
 
-// hooksDir is where apt install the shell hooks scripts for "recall logs"
-const hooksDir = "/usr/share/recall/hooks"
+//go:embed hooks/recall.bash hooks/recall.zsh hooks/recall.fish
+var embeddedHooks embed.FS
+
+// // hooksDir is where apt install the shell hooks scripts for "recall logs"
+// const hooksDir = "/usr/share/recall/hooks"
 
 // hookMarker is written into each hook script so appendShellHook can detect
 // whether it's already been added, instead of appending duplicates on every
 // `recall init` run.
-const hookMarker = "recall shell integration"
+const hookMarker = "recall shell hook"
 
 const (
 	bashShell shellType = "bash"
@@ -94,31 +97,29 @@ func cmdInit(dbPath string) {
 		// add to fish shell
 		appendShellHook("recall.fish", "config.fish")
 	default:
-		fatal("could not detect your shell from $SHELL — source the appropriate hook manually from %s", hooksDir)
+		fatal("could not detect your shell from $SHELL — run `recall hook bash|zsh|fish` to print the hook manually")
 	}
 
 }
 
-func appendShellHook(hookName, shellFile string) {
+// appendShellHook reads the given embedded hook (e.g. "hooks/recall.bash")
+// and appends it to the user's shell config file, skipping if it's already
+// present. Since the hook content is embedded in the binary at build time,
+// this works identically whether recall was installed via apt or built from
+// source — there's no dependency on any file existing on disk at runtime.
+func appendShellHook(embeddedPath, shellFile string) {
+	// fetch embedded hooks dir
+	content, err := embeddedHooks.ReadFile(embeddedPath)
+	if err != nil {
+		fatal("falled to read embedded hook %s: %v", embeddedPath, err)
+	}
+
 	// fetch home dir
 	home, err := os.UserHomeDir()
 	if err != nil {
 		// return "", err
 		fatal("unable to access homeDir: %v", err)
 	}
-
-	dir, err := resolveHooksDir()
-	if err != nil {
-		fatal("%v", err)
-	}
-
-	// Open source file first
-	fullpath := filepath.Join(dir, hookName)
-	src, err := os.Open(fullpath)
-	if err != nil {
-		fatal("failed to open source file: %v", err)
-	}
-	defer src.Close()
 
 	dstPath := filepath.Join(home, shellFile)
 	// Open destination file
@@ -142,18 +143,19 @@ func appendShellHook(hookName, shellFile string) {
 		}
 	}
 
-	dst, err := os.OpenFile(dstPath, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+	f, err := os.OpenFile(dstPath, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
 	if err != nil {
 		fatal("failed to open destination file: %v", err)
 	}
-	defer dst.Close()
+	defer f.Close()
 
 	// stream content to shell file
-	_, err = io.Copy(dst, src)
+	_, err = f.Write(content)
 	if err != nil {
 		fatal("unable to append content to shell config: %v", err)
 	}
-	fmt.Println("Setup Complete")
+	fmt.Printf("added  recall hook to %s\n", dstPath)
+	fmt.Println("Setup Complete - restart your shell or source the config to start logging")
 }
 
 func detectShell() string {
@@ -162,27 +164,6 @@ func detectShell() string {
 		return ""
 	}
 	return filepath.Base(shellPath)
-}
-
-func resolveHooksDir() (string, error) {
-	if _, err := os.Stat(hooksDir); err == nil {
-		return hooksDir, nil
-	}
-
-	exe, err := os.Executable()
-	if err == nil {
-		local := filepath.Join(filepath.Dir(exe), "hooks")
-		if _, err := os.Stat(local); err == nil {
-			return local, nil
-		}
-	}
-
-	cwdHooks := filepath.Join(".", "hooks")
-	if _, err := os.Stat(cwdHooks); err == nil {
-		return cwdHooks, nil
-	}
-
-	return "", fmt.Errorf("could not find hook scripts in %s, next to the binary, or in ./hooks — if you built from source, run recall init from the repo root", hooksDir)
 }
 
 func fatal(format string, args ...any) {
