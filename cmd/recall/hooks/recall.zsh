@@ -1,4 +1,4 @@
-# recall zsh integration
+# recall shell hook
 
 _recall_session_id="${_recall_session_id:-$(date +%s%N)-$$}"
 

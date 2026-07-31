@@ -1,4 +1,4 @@
-# recall fish integration
+# recall shell hook
 
 set -g _recall_session_id (date +%s%N)-(status current-pid)
 

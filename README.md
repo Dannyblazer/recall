@@ -1,4 +1,4 @@
-# recall — persistent, searchable shell history
+# recall - a persistent, searchable shell history
 
 ## Install
 
@@ -11,12 +11,13 @@ sudo apt-get install recall
 
 This adds the signed `recall` apt repository and installs the latest release. Packages are built, signed, and published automatically via CI on every tagged release.
 
+Note: Always remember "apt update" to get latest releases
+
 ### Build from source
 
 ```
 go mod tidy   # fetches modernc.org/sqlite (pure Go, no cgo needed)
 go build -o recall ./cmd/recall
-sudo mv recall /usr/local/bin/
 ```
 
 ## Setup
@@ -25,18 +26,8 @@ sudo mv recall /usr/local/bin/
 recall init
 ```
 
-Then add the relevant hook to your shell config:
+The necesary hook gets added to your shell config to catch/store all your commands.
 
-```
-# ~/.bashrc
-source /path/to/hooks/recall.bash
-
-# ~/.zshrc
-source /path/to/hooks/recall.zsh
-
-# ~/.config/fish/config.fish
-source /path/to/hooks/recall.fish
-```
 
 Open a new shell (or `source` the config) and every command you run will be
 logged in the background to `~/.local/share/recall/history.db`.
