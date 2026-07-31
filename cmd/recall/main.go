@@ -89,13 +89,13 @@ func cmdInit(dbPath string) {
 	switch shell {
 	case string(bashShell):
 		// add to bash shell .bashrc
-		appendShellHook("recall.bash", ".bashrc")
+		appendShellHook("hooks/recall.bash", ".bashrc")
 	case string(zshShell):
 		// add to zsh shell
-		appendShellHook("recall.zsh", ".zshrc")
+		appendShellHook("hooks/recall.zsh", ".zshrc")
 	case string(fishShell):
 		// add to fish shell
-		appendShellHook("recall.fish", "config.fish")
+		appendShellHook("hooks/recall.fish", "config.fish")
 	default:
 		fatal("could not detect your shell from $SHELL — run `recall hook bash|zsh|fish` to print the hook manually")
 	}
