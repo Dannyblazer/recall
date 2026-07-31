@@ -1,4 +1,4 @@
-# recall — persistent, searchable shell history
+# recall - a persistent, searchable shell history
 
 ## Install
 
